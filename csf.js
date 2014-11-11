@@ -13,7 +13,7 @@ var ctx = canvas.getContext('2d');
 var raw_mouse = {x:0, y:0};
 var ticks = 0;
 var seglength = 5;
-var debug = /debug/.test(window.location.hash) ? true : false;
+var debug = function() { return /debug/.test(window.location.hash); };
 var drawing = false;
 var fresh_curve = [];
 var curves = [];
@@ -134,7 +134,7 @@ var tick = function() {
         ctx.font = '40px Computer Modern Serif';
         ctx.fillText('Draw a closed curve',canvas.width/2, 10);
     }
-    if (debug) {
+    if (debug()) {
         ctx.font = '30px monospace';
         ctx.fillText('canvas space = (' + canvas.width + ',' + canvas.height + ')',canvas.width/2, 80);
         ctx.fillText('<canvas> dims= (' + $(canvas).width() + ',' + $(canvas).height() + ')',canvas.width/2, 120);
@@ -232,7 +232,7 @@ eachcurve: for (var j = 0; j < curves.length; j++) {
         }
         cu = curves[j] = newCurve;
 
-        if (debug) {
+        if (debug()) {
             ctx.fillStyle = 'green';
             ctx.textBaseline = 'middle';
             ctx.fillText(cu.length,mean.x,mean.y);
@@ -266,7 +266,7 @@ var drawCurve = function(cu, no_close) {
         if (Math.abs(cu[i].kappa) > 1) {
             ctx.fillCircle(cu[i].x,cu[i].y,Math.log(1+Math.abs(cu[i].kappa)));
         }
-        if (debug) ctx.fillRect(cu[i].x - 1, cu[i].y - 1, 3, 3);
+        if (debug()) ctx.fillRect(cu[i].x - 1, cu[i].y - 1, 3, 3);
     }
     ctx.restore();
 };
