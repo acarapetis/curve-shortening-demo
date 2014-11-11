@@ -6,6 +6,7 @@
  * This work is also one big hack. Don't judge me.
  */
 
+// {{{ Setup
 var canvas = $('canvas')[0];
 canvas.onselectstart = function() {return false;};
 var ctx = canvas.getContext('2d');
@@ -13,6 +14,10 @@ var raw_mouse = {x:0, y:0};
 var ticks = 0;
 var seglength = 5;
 var debug = /debug/.test(window.location.hash) ? true : false;
+var drawing = false;
+var fresh_curve = [];
+var curves = [];
+var dt = 1;
 
 ctx.fillCircle = function(x,y,r) {
     this.beginPath();
@@ -39,7 +44,19 @@ var resize = function() {
     // slow ass-phone.
     seglength = 5 * PIXEL_RATIO;
 };
+// }}}
 
+// {{{ point distance functions for convenience
+var d2 = function(a,b) {
+    var dx = a.x - b.x;
+    var dy = a.y - b.y;
+    return dx*dx+dy*dy;
+};
+
+var len2 = function(a) { return d2(a,{x:0,y:0}); };
+// }}}
+  
+// {{{ Input Handling
 $(window).on('resize orientationchange', resize);
 
 var mousemove = function(evt) {
@@ -88,20 +105,9 @@ $(canvas).on('mouseup touchend', function(e) {
     curves.push(fresh_curve);
 });
 
-var d2 = function(a,b) {
-    var dx = a.x - b.x;
-    var dy = a.y - b.y;
-    return dx*dx+dy*dy;
-};
+// }}}
 
-var len2 = function(a) { return d2(a,{x:0,y:0}); };
-
-var drawing = false;
-var fresh_curve = [];
-
-var curves = [];
-var dt = 1;
-
+// {{{ The "one giant function" design pattern
 var tick = function() {
     ticks++;
 
@@ -236,7 +242,9 @@ eachcurve: for (var j = 0; j < curves.length; j++) {
         if (maxkappa > 2000 || curves[j].length < 5) curves.splice(j--,1);
     }
 };
+// }}}
 
+// {{{ ...at least I factored this out
 var drawCurve = function(cu, no_close) {
     ctx.save();
     ctx.beginPath();
@@ -262,10 +270,12 @@ var drawCurve = function(cu, no_close) {
     }
     ctx.restore();
 };
+// }}}
 
-// bombs away
+// {{{ bombs away
 $(window).on('load',function() {
     resize();
     setInterval(tick, 15);
     MathJax.Hub.Queue(resize);
 });
+// }}}
