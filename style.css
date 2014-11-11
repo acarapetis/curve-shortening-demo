@@ -1,0 +1,70 @@
+html, body { 
+    margin: 0; padding: 0;
+    font-family: 'Computer Modern Serif', serif;
+    overflow-x: hidden;
+}
+
+body {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    height:100%;
+}
+canvas { 
+    display: block;
+    flex: 5 0 1px;
+    -ms-touch-action: none;
+}
+div#info {
+    padding: 0.5em;
+    border-left: 1px solid black;
+    overflow-y: auto;
+    flex: 1 0 150px;
+}
+
+#info p{
+    margin-top: 0;
+    margin-bottom: 1em;
+}
+
+a.title {
+    font-size: 150%;
+    line-height: 0.5;
+}
+a,a:visited {
+    color: #5BACF0;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #569CE7;
+    text-decoration: underline;
+}
+
+@media all and (max-width: 500px) { /* Should capture portrait smartphones */
+    body {
+        flex-direction: column;
+    }
+
+    div#info {
+        border-left: none;
+        border-top: 1px solid black;
+        min-height: 30%;
+    }
+}
+
+#clear {
+    position: absolute;
+    top: 0.5em;
+    left:0.5em;
+}
+
+#clear:hover {
+    cursor: pointer;
+}
+
+@-ms-viewport, @viewport {
+    width: device-width; 
+    initial-scale: 1;
+    maximum-scale: 1;
+}
