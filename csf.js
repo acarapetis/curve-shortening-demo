@@ -164,7 +164,7 @@ eachcurve: for (var j = 0; j < curves.length; j++) {
                     y: a.y + seglength * dy/dr
                 });
             }
-            else if (cu.length > 4 && dr2 * 2 < seglength * seglength) {
+            else if (cu.length > 4 && dr2 * 4 < seglength * seglength) {
                 cu.splice(i--,1);
             }
         }
