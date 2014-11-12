@@ -148,6 +148,14 @@ eachcurve: for (var j = 0; j < curves.length; j++) {
         if (j == curves.length) break;
         var cu = curves[j];
 
+        // Check for infinities and nuke them
+        for (var i = 0; i < cu.length; i++) {
+            var a = cu[i];
+            if (!(isFinite(a.x) && isFinite(a.y))) {
+                cu.splice(i--,1);
+            }
+        }
+
         // Redivide curve to keep nodes evenly distributed
         for (var i = 0; i < cu.length; i++) {
             var a = cu[i];
@@ -239,7 +247,7 @@ eachcurve: for (var j = 0; j < curves.length; j++) {
         }
         drawCurve(cu);
 
-        if (maxkappa > 2000 || curves[j].length < 5) curves.splice(j--,1);
+        if (maxkappa > 5000 || curves[j].length < 5) curves.splice(j--,1);
     }
 };
 // }}}
