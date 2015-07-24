@@ -159,7 +159,7 @@ eachcurve: for (var j = 0; j < curves.length; j++) {
             }
         }
 
-        // Redivide curve to keep nodes evenly distributed
+        // Remesh: Redivide curve to keep nodes evenly distributed
         for (var i = 0; i < cu.length; i++) {
             var a = cu[i];
             var bi = (i < cu.length - 1 ? i+1 : 0), b = cu[bi];
@@ -169,6 +169,7 @@ eachcurve: for (var j = 0; j < curves.length; j++) {
 
             var dr2 = dx*dx + dy*dy;
             if (dr2 > 4*seglength*seglength) {
+                // If vertices are too far apart, add a new vertex in between
                 var dr = Math.pow(dr2, 1/2);
                 cu.splice(1+i,0,{
                     x: a.x + seglength * dx/dr,
@@ -176,6 +177,7 @@ eachcurve: for (var j = 0; j < curves.length; j++) {
                 });
             }
             else if (cu.length > 4 && dr2 * 4 < seglength * seglength) {
+                // If vertices are too close, remove one of them
                 cu.splice(i--,1);
             }
         }
