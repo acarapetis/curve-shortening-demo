@@ -111,8 +111,8 @@ $(canvas).on('mouseup touchend', function(e) {
 var tick = function() {
     ticks++;
 
-    if (ticks == 1) {
-        // Interesting demo curve to start
+    if (ticks == 1) { // first tick
+        // Generate an interesting demo curve to start.
         var N = 200;
         var curve = [];
         for (var i = 0; i < N; i++) {
@@ -125,6 +125,7 @@ var tick = function() {
         curves.push(curve);
     }
     
+    // Clear screen and draw text
     ctx.clearRect(0,0,canvas.width,canvas.height);
 
     ctx.fillStyle = 'black';
@@ -139,16 +140,18 @@ var tick = function() {
         ctx.fillText('canvas space = (' + canvas.width + ',' + canvas.height + ')',canvas.width/2, 80);
         ctx.fillText('<canvas> dims= (' + $(canvas).width() + ',' + $(canvas).height() + ')',canvas.width/2, 120);
     }
+
+    // If user is currently drawing a curve, show it in grey.
     ctx.fillStyle = 'darkgrey';
     if (drawing) drawCurve(fresh_curve, true);
     ctx.fillStyle = 'black';
 
 eachcurve: for (var j = 0; j < curves.length; j++) {
-        if (curves[j].length < 5) curves.splice(j,1);
+        if (curves[j].length < 5) curves.splice(j,1); // If curve has less than 5 vertices, destroy it.
         if (j == curves.length) break;
         var cu = curves[j];
 
-        // Check for infinities and nuke them
+        // Remove any vertices with infinite coordinates
         for (var i = 0; i < cu.length; i++) {
             var a = cu[i];
             if (!(isFinite(a.x) && isFinite(a.y))) {
@@ -177,6 +180,7 @@ eachcurve: for (var j = 0; j < curves.length; j++) {
             }
         }
 
+        // Compute maximum curvature and remove any discrete cusps (i.e. consecutive vertices a b c with a=c)
         var maxkappa = 0;
         var mean = {x:0, y:0};
         for (var i = 0; i < cu.length; i++) {
@@ -209,7 +213,7 @@ eachcurve: for (var j = 0; j < curves.length; j++) {
         mean.y /= cu.length;
 
         // Flow
-        var newCurve = JSON.parse(JSON.stringify(cu));
+        var newCurve = JSON.parse(JSON.stringify(cu)); // duplicate the curve data
         for (var i = 0; i < cu.length; i++) {
             var b = cu[i];
 
@@ -218,8 +222,6 @@ eachcurve: for (var j = 0; j < curves.length; j++) {
 
             var dr2 = b.dr2;
             var kappa = b.kappa;
-
-            var nu = { x: -dy/Math.pow(dr2,0.5), y: dx/Math.pow(dr2,0.5) };
 
             newCurve[i] = {
                 // Reparametrized CSF:
@@ -232,14 +234,19 @@ eachcurve: for (var j = 0; j < curves.length; j++) {
                     || newCurve[i].x < -1
                     || newCurve[i].y > canvas.height +1
                     || newCurve[i].y < -1) {
-                // Out of bounds,  must have been some kind of numerical instability
-                // Try just cutting out the single node, but usually this ends up getting nuked
+                // New vertex position is out of bounds! The maximum principle
+                // tells us this can't happen for the smooth flow, so there
+                // must be some kind of numerical instability here.
+                // Try just cutting out the single vertex, but usually this
+                // curve ends up getting nuked next tick.
                 newCurve.splice(i,1);
                 cu.splice(i--,1);
             }
         }
+        // Replace curve with new version
         cu = curves[j] = newCurve;
 
+        // Draw curve
         if (debug()) {
             ctx.fillStyle = 'green';
             ctx.textBaseline = 'middle';
@@ -247,6 +254,7 @@ eachcurve: for (var j = 0; j < curves.length; j++) {
         }
         drawCurve(cu);
 
+        // Destroy curve if it is too small or curvature is too extreme
         if (maxkappa > 5000 || curves[j].length < 5) curves.splice(j--,1);
     }
 };
