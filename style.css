@@ -5,21 +5,23 @@ html, body {
 }
 
 body {
-    display: flex;
-    flex-direction: row;
+    position: relative;
     padding: 0;
     height:100%;
 }
 canvas { 
     display: block;
-    flex: 5 0 1px;
+    width: 100%;
+    height:100%;
     -ms-touch-action: none;
 }
 div#info {
+    position: absolute;
+    right:0; top:0;
+    width: 200px;
     padding: 0.5em;
     border-left: 1px solid black;
     overflow-y: auto;
-    flex: 1 0 150px;
 }
 
 #info p{
@@ -42,14 +44,16 @@ a:hover {
 }
 
 @media all and (max-width: 500px) { /* Should capture portrait smartphones */
-    body {
-        flex-direction: column;
-    }
-
     div#info {
+        position: absolute;
+        top: auto;
+        right: auto;
+        bottom: 0;
+        left: 0;
         border-left: none;
         border-top: 1px solid black;
-        min-height: 30%;
+        height: 200px;
+        width: 100%;
     }
 }
 

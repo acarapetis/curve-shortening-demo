@@ -265,14 +265,21 @@ eachcurve: for (var j = 0; j < curves.length; j++) {
 // {{{ ...at least I factored this out
 var drawCurve = function(cu, no_close) {
     ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(cu[0].x, cu[0].y);
     for (var i = 1; i < cu.length; i++) {
+        ctx.strokeStyle = 'rgb(' + Math.floor(10000*Math.abs(cu[i].kappa)) + ',0,0)';
+        ctx.fillStyle = 'rgb(' + Math.floor(10000*Math.abs(cu[i].kappa)) + ',0,0)';
+        if (debug()) ctx.fillRect(cu[i].x - 1, cu[i].y - 1, 3, 3);
+        ctx.beginPath();
+        ctx.moveTo(cu[i-1].x, cu[i-1].y);
         ctx.lineTo(cu[i].x, cu[i].y);
+        ctx.stroke();
         var z = Math.round(i * 255 / cu.length);
     }
-    ctx.stroke();
     if (no_close) ctx.globalAlpha = 0.25;
+    ctx.strokeStyle = 'rgb(' + Math.floor(10000*(Math.abs(cu[0].kappa))) + ',0,0)';
+    ctx.fillStyle = 'rgb(' + Math.floor(10000*(Math.abs(cu[0].kappa))) + ',0,0)';
+    if (debug()) ctx.fillRect(cu[0].x - 1, cu[0].y - 1, 3, 3);
+    
     ctx.beginPath();
     ctx.moveTo(cu[0].x,cu[0].y);
     ctx.lineTo(cu[cu.length-1].x,cu[cu.length-1].y);
@@ -284,7 +291,6 @@ var drawCurve = function(cu, no_close) {
         if (Math.abs(cu[i].kappa) > 1) {
             ctx.fillCircle(cu[i].x,cu[i].y,Math.log(1+Math.abs(cu[i].kappa)));
         }
-        if (debug()) ctx.fillRect(cu[i].x - 1, cu[i].y - 1, 3, 3);
     }
     ctx.restore();
 };
