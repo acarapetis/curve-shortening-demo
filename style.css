@@ -17,8 +17,11 @@ canvas {
 }
 div#info {
     position: absolute;
-    right:0; top:0;
-    width: 200px;
+    right:0; 
+    top:0;
+    height: 100vh;
+    box-sizing: border-box;
+    width: 250px;
     padding: 0.5em;
     border-left: 1px solid black;
     overflow-y: auto;
@@ -31,7 +34,7 @@ div#info {
 
 a.title {
     font-size: 150%;
-    line-height: 0.5;
+    line-height: 0.8em;
 }
 a,a:visited {
     color: #5BACF0;
