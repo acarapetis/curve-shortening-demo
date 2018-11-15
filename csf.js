@@ -1,13 +1,12 @@
-/* Author: anthony.carapetis@gmail.com
- * This work is free software. It comes without any warranty, to the extent
- * permitted by applicable law.  You can redistribute it and/or modify it under
- * the terms of the Do What The Fuck You Want To Public License, Version 2,
- * as published by Sam Hocevar. See the COPYING file for more details.
- * This work is also one big hack. Don't judge me.
- */
+// Copyright (c) 2014-2018 Anthony Carapetis
+// This software is licensed under the MIT license.
+// See COPYING for more details.
+
+import {flowArray} from './flow.js';
+import {renderClosedCurve, renderPath} from './graphics.js';
 
 // {{{ Setup
-var canvas = $('canvas')[0];
+var canvas = document.querySelector('canvas');
 canvas.onselectstart = function() {return false;};
 var ctx = canvas.getContext('2d');
 var raw_mouse = {x:0, y:0};
@@ -18,6 +17,9 @@ var drawing = false;
 var fresh_curve = [];
 var curves = [];
 var dt = 1;
+
+const toPairs = a => a.map(({x,y}) => [x,y]);
+const fromPairs = a => a.map(([x,y]) => ({x,y}));
 
 ctx.fillCircle = function(x,y,r) {
     this.beginPath();
@@ -36,8 +38,8 @@ var resize = function() {
           ||  ctx.backingStorePixelRatio || 1;
     var PIXEL_RATIO = dpr/bsr;
 
-    canvas.width    = $('canvas').width() * PIXEL_RATIO;
-    canvas.height   = $('canvas').height() * PIXEL_RATIO;
+    canvas.width    = canvas.clientWidth * PIXEL_RATIO;
+    canvas.height   = canvas.clientHeight * PIXEL_RATIO;
 
     // If you have super high dpi then 1. you don't need as many 
     // segments/pixel and 2. you're probably running this on a moderately
@@ -57,7 +59,8 @@ var len2 = function(a) { return d2(a,{x:0,y:0}); };
 // }}}
   
 // {{{ Input Handling
-$(window).on('resize orientationchange', resize);
+window.addEventListener('resize', resize);
+window.addEventListener('orientationchange', resize);
 
 var mousemove = function(evt) {
     var rect = canvas.getBoundingClientRect();
@@ -68,8 +71,8 @@ var mousemove = function(evt) {
     if (drawing && d2(raw_mouse,fresh_curve[fresh_curve.length - 1]) > seglength*seglength) fresh_curve.push(raw_mouse);
 };
 
-$(canvas).on('mousemove', mousemove);
-$(canvas).on('touchmove', function(e) { 
+canvas.addEventListener('mousemove', mousemove);
+canvas.addEventListener('touchmove', function(e) { 
     mousemove(e.originalEvent.changedTouches[0]); 
     return false;
 });
@@ -82,13 +85,13 @@ var mousedown = function(e) {
     return false;
 };
 
-$(canvas).on('touchstart', function(e) {
+canvas.addEventListener('touchstart', function(e) {
     mousedown(e.originalEvent.changedTouches[0]); 
     return false;
 });
-$(canvas).on('mousedown', mousedown);
+canvas.addEventListener('mousedown', mousedown);
 
-$(canvas).on('mouseup touchend', function(e) {
+function mouseup(e) {
     if (!drawing) return;
     if (('button' in e) && e.button > 0) return;
     drawing = false;
@@ -103,7 +106,9 @@ $(canvas).on('mouseup touchend', function(e) {
         });
     }
     curves.push(fresh_curve);
-});
+}
+canvas.addEventListener('mouseup', mouseup);
+canvas.addEventListener('touchend', mouseup);
 
 // }}}
 
@@ -143,10 +148,10 @@ var tick = function() {
 
     // If user is currently drawing a curve, show it in grey.
     ctx.fillStyle = 'darkgrey';
-    if (drawing) drawCurve(fresh_curve, true);
+    if (drawing) renderPath(toPairs(fresh_curve), ctx, 0.25);
     ctx.fillStyle = 'black';
 
-eachcurve: for (var j = 0; j < curves.length; j++) {
+    for (var j = 0; j < curves.length; j++) {
         if (curves[j].length < 5) curves.splice(j,1); // If curve has less than 5 vertices, destroy it.
         if (j == curves.length) break;
         var cu = curves[j];
@@ -176,6 +181,7 @@ eachcurve: for (var j = 0; j < curves.length; j++) {
                     y: a.y + seglength * dy/dr
                 });
             }
+
             else if (cu.length > 4 && dr2 * 4 < seglength * seglength) {
                 // If vertices are too close, remove one of them
                 cu.splice(i--,1);
@@ -215,46 +221,11 @@ eachcurve: for (var j = 0; j < curves.length; j++) {
         mean.y /= cu.length;
 
         // Flow
-        var newCurve = JSON.parse(JSON.stringify(cu)); // duplicate the curve data
-        for (var i = 0; i < cu.length; i++) {
-            var b = cu[i];
+        cu = curves[j] = fromPairs(
+            flowArray(toPairs(cu),dt/maxkappa)
+        );
 
-            var dx = b.dx;
-            var dy = b.dy;
-
-            var dr2 = b.dr2;
-            var kappa = b.kappa;
-
-            newCurve[i] = {
-                // Reparametrized CSF:
-                x:  b.x + b.ddx * dt / (dr2 * maxkappa),
-                y:  b.y + b.ddy * dt / (dr2 * maxkappa),
-                kappa: kappa
-            };
-
-            if (newCurve[i].x > canvas.width + 1
-                    || newCurve[i].x < -1
-                    || newCurve[i].y > canvas.height +1
-                    || newCurve[i].y < -1) {
-                // New vertex position is out of bounds! The maximum principle
-                // tells us this can't happen for the smooth flow, so there
-                // must be some kind of numerical instability here.
-                // Try just cutting out the single vertex, but usually this
-                // curve ends up getting nuked next tick.
-                newCurve.splice(i,1);
-                cu.splice(i--,1);
-            }
-        }
-        // Replace curve with new version
-        cu = curves[j] = newCurve;
-
-        // Draw curve
-        if (debug()) {
-            ctx.fillStyle = 'green';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(cu.length,mean.x,mean.y);
-        }
-        drawCurve(cu);
+        renderClosedCurve(new CircularList(toPairs(cu)),ctx);
 
         // Destroy curve if it is too small or curvature is too extreme
         if (maxkappa > 5000 || curves[j].length < 5) curves.splice(j--,1);
@@ -262,42 +233,8 @@ eachcurve: for (var j = 0; j < curves.length; j++) {
 };
 // }}}
 
-// {{{ ...at least I factored this out
-var drawCurve = function(cu, no_close) {
-    ctx.save();
-    for (var i = 1; i < cu.length; i++) {
-        ctx.strokeStyle = 'rgb(' + Math.floor(10000*Math.abs(cu[i].kappa)) + ',0,0)';
-        ctx.fillStyle = 'rgb(' + Math.floor(10000*Math.abs(cu[i].kappa)) + ',0,0)';
-        if (debug()) ctx.fillRect(cu[i].x - 1, cu[i].y - 1, 3, 3);
-        ctx.beginPath();
-        ctx.moveTo(cu[i-1].x, cu[i-1].y);
-        ctx.lineTo(cu[i].x, cu[i].y);
-        ctx.stroke();
-        var z = Math.round(i * 255 / cu.length);
-    }
-    if (no_close) ctx.globalAlpha = 0.25;
-    ctx.strokeStyle = 'rgb(' + Math.floor(10000*(Math.abs(cu[0].kappa))) + ',0,0)';
-    ctx.fillStyle = 'rgb(' + Math.floor(10000*(Math.abs(cu[0].kappa))) + ',0,0)';
-    if (debug()) ctx.fillRect(cu[0].x - 1, cu[0].y - 1, 3, 3);
-    
-    ctx.beginPath();
-    ctx.moveTo(cu[0].x,cu[0].y);
-    ctx.lineTo(cu[cu.length-1].x,cu[cu.length-1].y);
-    ctx.stroke();
-
-    ctx.globalAlpha= 1;
-    ctx.fillStyle = 'red';
-    for (var i = 0; i < cu.length; i++) {
-        if (Math.abs(cu[i].kappa) > 1) {
-            ctx.fillCircle(cu[i].x,cu[i].y,Math.log(1+Math.abs(cu[i].kappa)));
-        }
-    }
-    ctx.restore();
-};
-// }}}
-
 // {{{ bombs away
-$(window).on('load',function() {
+window.addEventListener('load',function() {
     resize();
     setInterval(tick, 15);
     MathJax.Hub.Queue(resize);
