@@ -8,6 +8,7 @@ export default {
 	output: {
         file: 'build/bundle.js',
 		format: 'iife',
+        sourcemap: 'inline',
 	},
 	onwarn(warning) {
 		console.error(`(!) ${warning.message}`);

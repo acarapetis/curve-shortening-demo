@@ -19,7 +19,7 @@
   },
   "scripts": {
     "browse": "browser-sync start --s --ss build --index index.html --files *.html,build/*.js,*.css --no-notify",
-    "build:dev": "rollup -c -w",
+    "build:dev": "rollup -c -w -m",
     "start": "npm-run-all --parallel build:dev browse"
   },
   "repository": {

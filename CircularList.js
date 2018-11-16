@@ -38,8 +38,14 @@ export class CircularList {
         this._data.splice(0, startLength, ...values.slice(endLength));
     }
 
-    *[Symbol.iterator]() {
-        for (let v of this._data) yield v;
+    filter(fn) {
+        return new this.constructor(this._data.filter(
+            (x,i) => fn(x,i,this.neighbourhood(i))
+        ));
+    }
+
+    [Symbol.iterator]() {
+        return this._data.values();
     }
 
     *neighbourhoods() {
@@ -53,10 +59,13 @@ export class CircularList {
     }
 
     map(fn) {
-        return new CircularList(
+        return new this.constructor(
             this._data.map((x,i) => fn(x,i,this.neighbourhood(i)))
         )
     }
+
+    max() { return Math.max(...this._data); }
+    min() { return Math.min(...this._data); }
 }
 
 // A sensible modulo:
@@ -64,11 +73,3 @@ export class CircularList {
 function mod(k,n) {
     return (k%n + n)%n;
 }
-
-class Curve {
-    constructor(data = []) {
-        this.points = new CircularList(data);
-    }
-}
-
-window.CircularList = CircularList;
