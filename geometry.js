@@ -22,7 +22,11 @@ export function scale([x,y],c) {
 }
 
 export function squaredLength([x,y]) {
-    return x*x+y*y;
+    return x*x + y*y;
+}
+
+export function dot([u,v],[x,y]) {
+    return u*x + v*y;
 }
 
 export function cross([u,v],[x,y]) {
@@ -38,6 +42,6 @@ export function curvature(curve) {
         const twiceDisplacement = subtract(x(1),x(-1));
         const laplacian = add(x(1), x(-1), scale(x(0),-2));
         const dr2 = squaredLength(subtract(x(1),x(-1))) * 0.25;
-        return 0.5 * cross(twiceDisplacement, laplacian) * dr2**(-3/2);
+        return Math.abs(0.5 * cross(twiceDisplacement, laplacian) * dr2**(-3/2));
     });
 }

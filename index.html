@@ -1,17 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title>Curve Shortening Flow - Interactive Demonstration</title>
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <link rel="stylesheet" type="text/css" href="Serif/cmun-serif.css">
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <meta name=viewport content="width=device-width, initial-scale=1, maximum-scale=1">
   </head>
   <body>
-    <canvas id="canvas"></canvas>
-    <!--<script type="module" src="csf.js"></script>-->
-    <script src="build/bundle.js"></script>
-    <a id="clear" onclick="curves=[];">Clear curves</a>
+    <csf-app></csf-app>
     <div id="info">
       <p><a class="title" href="http://en.wikipedia.org/wiki/Curve-shortening_flow">Curve-shortening flow</a> is the simplest example of a curvature flow. It moves each point on a plane curve \(\gamma\) in the inwards normal direction \(-\nu\) with speed proportional to the signed curvature \(k\) at that point, as described by the equation</p>
       <p>$$ \frac{\partial \gamma}{\partial t} = - k \nu.$$</p>
@@ -21,5 +17,8 @@
       <p>The demonstration on this page scales time by a factor of \(1/\max |k|\) for each curve to avoid numerical errors. </p><p>Self-intersecting curves also jump over some cusps that are singularities of the smooth flow - this behaviour is qualitatively (and perhaps quantitatively) the same as that of the weak formulation of the flow. Red markers appear where the curvature is very large.</p>
       <p>&laquo; <a href="/">Home</a></p>
     </div>
+    <!--<script src="build/bundle.js"></script>-->
+    <!--<script type="module" src="csf.js"></script>-->
+    <script type="module" src="build/bundle.mjs"></script>
   </body>
 </html>

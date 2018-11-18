@@ -3,8 +3,11 @@
   "version": "1.1.0",
   "description": "An interactive demonstration of curve-shortening flow",
   "main": "csf.js",
-  "dependencies": {},
+  "dependencies": {
+    "@polymer/lit-element": "^0.6.3"
+  },
   "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
     "@babel/preset-env": "^7.1.6",
     "@babel/preset-react": "^7.0.0",
     "browser-sync": "^2.26.3",
@@ -18,8 +21,9 @@
     "rollup-plugin-terser": "^3.0.0"
   },
   "scripts": {
-    "browse": "browser-sync start --s --ss build --index index.html --files *.html,build/*.js,*.css --no-notify",
-    "build:dev": "rollup -c -w -m",
+    "browse": "browser-sync start --s --ss build --index index.html --files *.html,build/*.js,*.css,*.js --no-notify",
+    "build:dev": "rollup -c rollup.config.dev.js -w -m",
+    "build": "rollup -c rollup.config.js",
     "start": "npm-run-all --parallel build:dev browse"
   },
   "repository": {
