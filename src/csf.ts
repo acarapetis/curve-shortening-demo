@@ -7,6 +7,7 @@ import {renderClosedCurve, renderPath} from './graphics';
 import {point,Curve,scale,add,subtract,squaredLength} from './geometry';
 import {CircularList} from './CircularList';
 import {LitElement, html, property} from '@polymer/lit-element';
+import customElement from './customElement';
 import bind from 'bind-decorator';
 
 const d2 = (a : point, b : point) => squaredLength(subtract(a,b));
@@ -33,6 +34,7 @@ function eachTouch(handler : (touch : Touch) => any) {
     };
 }
 
+@customElement('csf-app')
 class CSFApp extends LitElement {
     touchPaths : Map<any,point[]> = new Map();
     curves : Curve[] = [];
@@ -208,8 +210,6 @@ class CSFApp extends LitElement {
     };
 
 }
-customElements.define('csf-app',CSFApp);
-  
 
 /*
 
