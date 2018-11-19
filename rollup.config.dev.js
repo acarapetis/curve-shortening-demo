@@ -1,10 +1,10 @@
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import {terser} from 'rollup-plugin-terser';
-import babel from 'rollup-plugin-babel';
+import typescript from 'rollup-plugin-typescript';
 
 export default {
-	input: 'csf.js',
+    input: 'src/csf.ts',
 	output: {
         file: 'build/bundle.mjs',
 		format: 'esm',
@@ -18,29 +18,7 @@ export default {
 		  jsnext: true,
 		  main: true,
 		}),
-        //commonjs(),
-		babel({
-            presets: [
-                ['@babel/preset-react', {}],
-                /*['@babel/preset-env', {
-                    useBuiltIns: 'usage',
-                    targets: '> 10%',
-                    modules: false,
-                }],*/
-            ],
-            plugins: [
-                "@babel/plugin-proposal-object-rest-spread",
-                "@babel/plugin-proposal-class-properties",
-            ],
-			exclude: [/\/core-js\//],
-		}),
-        /*
-		terser({
-			warnings: true,
-			mangle: {
-				module: true,
-			},
-		}),
-        */
+        commonjs(),
+        typescript(),
 	]
 }

@@ -2,22 +2,25 @@
 // This software is licensed under the MIT license.
 // See COPYING for more details.
 
-import {reparametrizedCSF, remesh, clean} from './flow.js';
-import {renderClosedCurve, renderPath} from './graphics.js';
-import {scale,curvature,add,subtract,squaredLength} from './geometry.js';
-import {CircularList} from './CircularList.js';
-import {LitElement, html} from '@polymer/lit-element';
+import {reparametrizedCSF, remesh, clean} from './flow';
+import {renderClosedCurve, renderPath} from './graphics';
+import {point,Curve,scale,add,subtract,squaredLength} from './geometry';
+import {CircularList} from './CircularList';
+import {LitElement, html, property} from '@polymer/lit-element';
+import bind from 'bind-decorator';
 
-const d2 = (a,b) => squaredLength(subtract(a,b));
+const d2 = (a : point, b : point) => squaredLength(subtract(a,b));
 const dt = 1;
 
 // Helper method for handling mouse and touch using the same functions
 // TODO: are native pointerEvents mature yet?
-function eachTouch(handler, self=false) {
-    if (self) handler = handler.bind(self);
-    return (e) => {
+function eachTouch(handler : (touch : Touch) => any) {
+    return (e : any) => {
+        if (('button' in e) && e.button > 0) return;
+
         const touchEvents = e.changedTouches
             || (e.originalEvent && e.originalEvent.changedTouches);
+
         if (touchEvents) {
             for (let e of touchEvents) handler(e);
             e.preventDefault();
@@ -31,18 +34,16 @@ function eachTouch(handler, self=false) {
 }
 
 class CSFApp extends LitElement {
-    constructor() {
-        super();
-        this.touchPaths = new Map();
-        this.curves = [];
-    }
+    touchPaths : Map<any,point[]> = new Map();
+    curves : Curve[] = [];
+    ctx ?: CanvasRenderingContext2D;
+    seglength : number = 5;
 
-    static get properties() {
-        return {
-            bufferWidth: { type: Number },
-            bufferHeight: { type: Number },
-        }
-    }
+    @property({type: Number})
+    bufferWidth = 300;
+
+    @property({type: Number})
+    bufferHeight = 200;
 
     render() {
         return html`
@@ -67,14 +68,14 @@ class CSFApp extends LitElement {
         `;
     }
 
-    get canvas() {
-        return this.shadowRoot.querySelector('canvas');
+    get canvas() : HTMLCanvasElement|undefined {
+        return this.shadowRoot && this.shadowRoot.querySelector('canvas') || undefined;
     }
 
     firstUpdated() {
         window.addEventListener('resize', this.resize);
         window.addEventListener('orientationchange', this.resize);
-        this.ctx = this.canvas.getContext('2d');
+        this.ctx = this.canvas && this.canvas.getContext('2d') || undefined;
         this.resize();
         this.tick();
     }
@@ -85,9 +86,12 @@ class CSFApp extends LitElement {
         window.removeEventListener('orientationchange', this.resize);
     }
 
-    resize = () => {
+    @bind
+    resize() {
         // Make sure 1 canvas pixel = 1 screen pixel
-        const ctx = this.ctx;
+        const ctx : any = this.ctx;
+        if (!ctx) return;
+
         const dpr = window.devicePixelRatio || 1;
         const bsr = ctx.webkitBackingStorePixelRatio 
             ||  ctx.mozBackingStorePixelRatio
@@ -96,8 +100,8 @@ class CSFApp extends LitElement {
             ||  ctx.backingStorePixelRatio || 1;
         const PIXEL_RATIO = dpr/bsr;
 
-        this.bufferWidth    = this.canvas.clientWidth * PIXEL_RATIO;
-        this.bufferHeight   = this.canvas.clientHeight * PIXEL_RATIO;
+        this.bufferWidth    = this.canvas && this.canvas.clientWidth * PIXEL_RATIO || 0;
+        this.bufferHeight   = this.canvas && this.canvas.clientHeight * PIXEL_RATIO || 0;
 
         // If you have super high dpi then 1. you don't need as many 
         // segments/pixel and 2. you're probably running this on a moderately
@@ -105,21 +109,22 @@ class CSFApp extends LitElement {
         this.seglength = 5 * PIXEL_RATIO;
     }
 
-    touchStart = e => {
-        if (('button' in e) && e.button > 0) return;
-
+    @bind
+    touchStart(e : Touch) {
         this.touchPaths.set(e.identifier, []);
         this.touchMove(e);
-
         return false;
     }
 
-    touchMove = e => {
+    @bind
+    touchMove(e : Touch) {
         const path = this.touchPaths.get(e.identifier);
         if (!path) return;
 
+        if (!this.canvas) return;
+
         const rect = this.canvas.getBoundingClientRect();
-        const pos = [
+        const pos : point = [
             (e.clientX-rect.left)/(rect.right-rect.left) * this.canvas.width,
             (e.clientY-rect.top)/(rect.bottom-rect.top) * this.canvas.height,
         ];
@@ -132,9 +137,8 @@ class CSFApp extends LitElement {
         return false;
     }
 
-    touchEnd = e => {
-        if (('button' in e) && e.button > 0) return;
-
+    @bind
+    touchEnd(e : Touch) {
         const path = this.touchPaths.get(e.identifier);
         if (!path) return;
 
@@ -147,17 +151,20 @@ class CSFApp extends LitElement {
             path.push(add(q,scale(d,this.seglength/l)));
         }
 
-        this.curves.push(new CircularList(path));
+        this.curves.push(new Curve(path));
         this.touchPaths.delete(e.identifier);
 
         return false;
     }
 
+    @bind
     tick() {
-        requestAnimationFrame(() => this.tick());
+        requestAnimationFrame(this.tick);
         const canvas = this.canvas;
         const ctx = this.ctx;
+        if (!ctx || !canvas) return;
 
+        ctx.fillStyle = 'red';
         // Clear screen and draw text
         ctx.clearRect(0,0,canvas.width,canvas.height);
 
@@ -181,16 +188,15 @@ class CSFApp extends LitElement {
 
         // Destroy curve if it is too small or curvature is too extreme
         this.curves = this.curves.filter(cu => 
-            cu.length >= 5
-            && curvature(cu).max() < 5000
+            cu.length >= 5 && cu.curvature().max() < 5000
         )
 
-        const inBounds = ([x,y]) => x > 0 && x < canvas.width && y > 0 && y < canvas.height;
+        const inBounds = ([x,y] : point) => x > 0 && x < canvas.width && y > 0 && y < canvas.height;
         for (let [j,cu] of this.curves.entries()) {
             cu = cu.filter(inBounds);
 
             // Flow
-            cu = this.curves[j] = cu.map(reparametrizedCSF(dt/curvature(cu).max()));
+            cu = this.curves[j] = cu.map(reparametrizedCSF(dt/cu.curvature().max()));
 
             // Clean
             remesh(cu, this.seglength);

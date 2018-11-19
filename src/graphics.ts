@@ -2,13 +2,13 @@
 // This software is licensed under the MIT license.
 // See COPYING for more details.
 
-import {CircularList} from './CircularList.js';
+import { point, Curve } from './geometry';
 
 /** Render a closed curve.
  * @param curve a CircularList of [x,y] pairs
  * @param ctx a 2d drawing context, e.g. as obtained from canvas.getContext('2d');
  */
-export function renderClosedCurve(curve,ctx) {
+export function renderClosedCurve(curve : Curve, ctx : CanvasRenderingContext2D) {
     ctx.save();
     ctx.beginPath();
 
@@ -28,7 +28,7 @@ export function renderClosedCurve(curve,ctx) {
  * @param ctx a 2d drawing context, e.g. as obtained from canvas.getContext('2d');
  * @param join_opacity the opacity of the path joining the start to finish
  */
-export function renderPath(path,ctx,join_opacity=0) {
+export function renderPath(path : point[], ctx : CanvasRenderingContext2D, join_opacity : number = 0) {
     ctx.save();
 
     ctx.moveTo(...path[0]);

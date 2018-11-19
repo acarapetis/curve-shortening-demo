@@ -2,24 +2,31 @@
 // This software is licensed under the MIT license.
 // See COPYING for more details.
 
-export class CircularList {
-    constructor(data=[]) {
-        this._data = Array.from(data);
+import { point } from './geometry';
+
+export type localFunction<T,V> =
+    (element : T, index : number, neighbourhood : ((offset : number) => T)) => V;
+
+export class CircularList<T> {
+    _data : T[] = []
+
+    constructor(data : T[]|CircularList<T> = []) {
+        this._data = (data instanceof CircularList) ? data._data: [...data];
     }
 
     get length() {
         return this._data.length;
     }
 
-    get(index) {
+    get(index : number) {
         return this._data[mod(index,this.length)];
     }
 
-    set(index,value) {
+    set(index : number, value : T) {
         this._data[mod(index,this.length)] = value;
     }
 
-    splice(index,count,...values) {
+    splice(index : number, count : number, ...values : T[]) {
         // easy cases
         if (count >= this.length) {
             this._data = [];
@@ -38,8 +45,8 @@ export class CircularList {
         this._data.splice(0, startLength, ...values.slice(endLength));
     }
 
-    filter(fn) {
-        return new this.constructor(this._data.filter(
+    filter(fn : localFunction<T,boolean>) {
+        return new (<any>this.constructor)(this._data.filter(
             (x,i) => fn(x,i,this.neighbourhood(i))
         ));
     }
@@ -54,22 +61,19 @@ export class CircularList {
         }
     }
 
-    neighbourhood(index) {
-        return offset => this.get(index + offset);
+    neighbourhood(index : number) {
+        return (offset : number) => this.get(index + offset);
     }
 
-    map(fn) {
-        return new this.constructor(
+    map<V,W extends CircularList<V>>(fn : localFunction<T,V>) : W {
+        return new (<any> this.constructor)(
             this._data.map((x,i) => fn(x,i,this.neighbourhood(i)))
         )
     }
-
-    max() { return Math.max(...this._data); }
-    min() { return Math.min(...this._data); }
 }
 
 // A sensible modulo:
 // The unique integer congruent to k mod n in [0,..,n-1]
-function mod(k,n) {
+function mod(k : number, n : number) {
     return (k%n + n)%n;
 }

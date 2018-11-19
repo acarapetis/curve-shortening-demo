@@ -1,10 +1,10 @@
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import {terser} from 'rollup-plugin-terser';
-import babel from 'rollup-plugin-babel';
+import typescript from 'rollup-plugin-typescript';
 
 export default {
-	input: 'csf.js',
+    input: 'src/csf.ts',
 	output: {
         file: 'build/bundle.min.js',
 		format: 'iife',
@@ -17,18 +17,8 @@ export default {
 		  jsnext: true,
 		  main: true,
 		}),
-        //commonjs(),
-		babel({
-            presets: [
-                ['@babel/preset-react', {}],
-                ['@babel/preset-env', {
-                    useBuiltIns: 'usage',
-                    targets: '> 0.1%',
-                    modules: false,
-                }],
-            ],
-			exclude: [/\/core-js\//],
-		}),
+        commonjs(),
+        typescript(),
 		terser({
 			warnings: true,
 			mangle: {

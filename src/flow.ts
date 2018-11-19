@@ -2,11 +2,11 @@
 // This software is licensed under the MIT license.
 // See COPYING for more details.
 
-import {add, subtract, scale, squaredLength, equals} from './geometry.js';
-import {CircularList} from './CircularList.js';
+import { localFunction } from './CircularList';
+import { point, add, subtract, scale, squaredLength, equals, Curve, ScalarFunction } from './geometry';
 
 // Forward Euler approximation to CSF with tangential reparametrization
-export function reparametrizedCSF(dt) {
+export function reparametrizedCSF(dt : number) : localFunction<point, point>{
     return (point, index, x) => {
         let laplacian = add(x(1), x(-1), scale(x(0),-2));
         let dr2 = squaredLength(subtract(x(1),x(-1))) * 0.25;
@@ -14,13 +14,7 @@ export function reparametrizedCSF(dt) {
     }
 }
 
-export function flowArray(array, dt) {
-    return Array.from(
-        (new CircularList(array)).map(reparametrizedCSF(dt))
-    );
-}
-
-export function remesh(cu,seglength) {
+export function remesh(cu : Curve, seglength : number) {
     // Remesh: Redivide curve to keep nodes evenly distributed
     for (let i = 0; i < cu.length; i++) {
         const a = cu.get(i);
@@ -42,7 +36,7 @@ export function remesh(cu,seglength) {
     }
 }
 
-export function clean(cu) {
+export function clean(cu : Curve) {
     for (let i = 0; i < cu.length; i++) {
         if (equals(cu.get(i), cu.get(i+2))) cu.splice(i--,2);
     }
