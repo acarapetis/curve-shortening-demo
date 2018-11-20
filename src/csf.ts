@@ -15,7 +15,7 @@ const dt = 1;
 
 // Helper method for handling mouse and touch using the same functions
 // TODO: are native pointerEvents mature yet?
-function eachTouch(handler : (touch : Touch) => any) {
+function eachTouch(handler : (touch : Touch) => void) {
     return (e : any) => {
         if (('button' in e) && e.button > 0) return;
 
@@ -23,9 +23,10 @@ function eachTouch(handler : (touch : Touch) => any) {
             || (e.originalEvent && e.originalEvent.changedTouches);
 
         if (touchEvents) {
-            for (let e of touchEvents) handler(e);
+            for (let touch of touchEvents) handler(touch);
             e.preventDefault();
         }
+
         else {
             // TODO: create a real Touch object instead?
             e.identifier = '__mouse__';
@@ -36,7 +37,7 @@ function eachTouch(handler : (touch : Touch) => any) {
 
 @customElement('csf-app')
 class CSFApp extends LitElement {
-    touchPaths : Map<any,point[]> = new Map();
+    touchPaths : Map<number,point[]> = new Map();
     curves : Curve[] = [];
     ctx ?: CanvasRenderingContext2D;
     seglength : number = 5;
@@ -115,7 +116,6 @@ class CSFApp extends LitElement {
     touchStart(e : Touch) {
         this.touchPaths.set(e.identifier, []);
         this.touchMove(e);
-        return false;
     }
 
     @bind
@@ -135,8 +135,6 @@ class CSFApp extends LitElement {
 
         if (!lastPos || d2(pos, lastPos) > this.seglength**2)
             path.push(pos);
-
-        return false;
     }
 
     @bind
@@ -155,8 +153,6 @@ class CSFApp extends LitElement {
 
         this.curves.push(new Curve(path));
         this.touchPaths.delete(e.identifier);
-
-        return false;
     }
 
     @bind
