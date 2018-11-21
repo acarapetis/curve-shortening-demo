@@ -46,7 +46,7 @@ export class CircularList<T> {
     }
 
     filter(fn : localFunction<T,boolean>) {
-        return new (<any>this.constructor)(this._data.filter(
+        return new (this.constructor as any)(this._data.filter(
             (x,i) => fn(x,i,this.neighbourhood(i))
         ));
     }
@@ -66,7 +66,7 @@ export class CircularList<T> {
     }
 
     map<V,W extends CircularList<V>>(fn : localFunction<T,V>) : W {
-        return new (<any> this.constructor)(
+        return new (this.constructor as any)(
             this._data.map((x,i) => fn(x,i,this.neighbourhood(i)))
         )
     }
