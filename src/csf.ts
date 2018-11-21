@@ -6,38 +6,41 @@ import {reparametrizedCSF, remesh, clean} from './flow';
 import {renderClosedCurve, renderPath} from './graphics';
 import {point,Curve,scale,add,subtract,squaredLength} from './geometry';
 import {CircularList} from './CircularList';
-import {LitElement, html, property} from '@polymer/lit-element';
-import customElement from './customElement';
+import {LitElement, html, property, query, queryAll, customElement} from '@polymer/lit-element';
 import bind from 'bind-decorator';
 
 const d2 = (a : point, b : point) => squaredLength(subtract(a,b));
 const dt = 1;
 
+class MouseTouch extends MouseEvent {
+    identifier = '__mouse__';
+
+    static from(e : MouseEvent) {
+        const ret : MouseTouch = e as MouseTouch;
+        ret.identifier = '__mouse__';
+        return ret;
+    }
+}
+
+type PointerInput = Touch | MouseTouch; 
 // Helper method for handling mouse and touch using the same functions
 // TODO: are native pointerEvents mature yet?
-function eachTouch(handler : (touch : Touch) => void) {
-    return (e : any) => {
-        if (('button' in e) && e.button > 0) return;
-
-        const touchEvents = e.changedTouches
-            || (e.originalEvent && e.originalEvent.changedTouches);
-
-        if (touchEvents) {
-            for (let touch of touchEvents) handler(touch);
-            e.preventDefault();
+function eachTouch(handler : (touch : PointerInput) => void) {
+    return (e : MouseEvent|TouchEvent) => {
+        if (e instanceof MouseEvent) {
+            if (e.button > 0) return;
+            return handler(MouseTouch.from(e));
         }
-
         else {
-            // TODO: create a real Touch object instead?
-            e.identifier = '__mouse__';
-            handler(e);
+            e.preventDefault();
+            return Array.from(e.changedTouches).map(handler);
         }
     };
 }
 
-@customElement('csf-app')
+@customElement('csf-app' as any)
 class CSFApp extends LitElement {
-    touchPaths : Map<number,point[]> = new Map();
+    touchPaths : Map<number|string,point[]> = new Map();
     curves : Curve[] = [];
     ctx ?: CanvasRenderingContext2D;
     seglength : number = 5;
@@ -71,9 +74,7 @@ class CSFApp extends LitElement {
         `;
     }
 
-    get canvas() : HTMLCanvasElement|undefined {
-        return this.shadowRoot && this.shadowRoot.querySelector('canvas') || undefined;
-    }
+    @query('canvas') canvas ?: HTMLCanvasElement;
 
     firstUpdated() {
         window.addEventListener('resize', this.resize);
@@ -113,13 +114,13 @@ class CSFApp extends LitElement {
     }
 
     @bind
-    touchStart(e : Touch) {
+    touchStart(e : PointerInput) {
         this.touchPaths.set(e.identifier, []);
         this.touchMove(e);
     }
 
     @bind
-    touchMove(e : Touch) {
+    touchMove(e : PointerInput) {
         const path = this.touchPaths.get(e.identifier);
         if (!path) return;
 
@@ -138,7 +139,7 @@ class CSFApp extends LitElement {
     }
 
     @bind
-    touchEnd(e : Touch) {
+    touchEnd(e : PointerInput) {
         const path = this.touchPaths.get(e.identifier);
         if (!path) return;
 
@@ -204,7 +205,6 @@ class CSFApp extends LitElement {
             renderClosedCurve(cu,ctx);
         }
     };
-
 }
 
 /*
