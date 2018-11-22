@@ -7,37 +7,37 @@
 // For example, |2u+v+w|^2 would be written 
 // squaredLength(add(scale(u,2),v,w)).
 
-import { CircularList } from './CircularList';
+import { CircularList, Neighbourhood } from './CircularList';
 
-export type point = [number,number];
+export type Point = [number,number];
 
-export function add(...vs : point[]) : point {
+export function add(...vs : Point[]) : Point {
     return vs.reduce(
         ([u,v],[x,y]) => [u+x,v+y]
     );
 }
 
-export function subtract([u,v] : point, [x,y] : point) : point {
+export function subtract([u,v] : Point, [x,y] : Point) : Point {
     return [u-x,v-y];
 }
 
-export function scale([x,y] : point, c : number) : point {
+export function scale([x,y] : Point, c : number) : Point {
     return [x*c,y*c];
 }
 
-export function squaredLength([x,y] : point) : number {
+export function squaredLength([x,y] : Point) : number {
     return x*x + y*y;
 }
 
-export function dot([u,v] : point,[x,y] : point) : number {
+export function dot([u,v] : Point,[x,y] : Point) : number {
     return u*x + v*y;
 }
 
-export function cross([u,v] : point,[x,y] : point) : number {
+export function cross([u,v] : Point,[x,y] : Point) : number {
     return u*y - v*x;
 }
 
-export function equals([u,v] : point,[x,y] : point) : boolean {
+export function equals([u,v] : Point,[x,y] : Point) : boolean {
     return u == x && v == y;
 }
 
@@ -46,17 +46,18 @@ export class ScalarFunction extends CircularList<number> {
     min() { return Math.min(...this._data); }
 }
 
-export class Curve extends CircularList<point> {
+export function curvature(x : Neighbourhood<Point>) : number {
+    const twiceDisplacement = subtract(x(1),x(-1));
+    const laplacian = add(x(1), x(-1), scale(x(0),-2));
+    const dr2 = squaredLength(subtract(x(1),x(-1))) * 0.25;
+    return Math.abs(0.5 * cross(twiceDisplacement, laplacian) * dr2**(-3/2));
+}
+
+export class Curve extends CircularList<Point> {
     curvature() : ScalarFunction {
-        const vals : CircularList<number> = 
-            this.map((p,i,x) => {
-                const twiceDisplacement = subtract(x(1),x(-1));
-                const laplacian = add(x(1), x(-1), scale(x(0),-2));
-                const dr2 = squaredLength(subtract(x(1),x(-1))) * 0.25;
-                const ret = Math.abs(0.5 * cross(twiceDisplacement, laplacian) * dr2**(-3/2));
-                return ret;
-            })
-        return new ScalarFunction(vals);
+        return new ScalarFunction(
+            this.map((p,i,nbhd) => curvature(nbhd)) as CircularList<number>
+        );
     }
 }
 

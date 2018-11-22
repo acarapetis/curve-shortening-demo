@@ -2,10 +2,12 @@
 // This software is licensed under the MIT license.
 // See COPYING for more details.
 
-import { point } from './geometry';
+import { Point } from './geometry';
 
-export type localFunction<T,V> =
-    (element : T, index : number, neighbourhood : ((offset : number) => T)) => V;
+export type Neighbourhood<T> = (offset : number) => T;
+
+export type LocalFunction<T,V> =
+    (element : T, index : number, neighbourhood : Neighbourhood<T>) => V;
 
 export class CircularList<T> {
     _data : T[] = []
@@ -45,7 +47,7 @@ export class CircularList<T> {
         this._data.splice(0, startLength, ...values.slice(endLength));
     }
 
-    filter(fn : localFunction<T,boolean>) {
+    filter(fn : LocalFunction<T,boolean>) {
         return new (this.constructor as any)(this._data.filter(
             (x,i) => fn(x,i,this.neighbourhood(i))
         ));
@@ -65,10 +67,14 @@ export class CircularList<T> {
         return (offset : number) => this.get(index + offset);
     }
 
-    map<V,W extends CircularList<V>>(fn : localFunction<T,V>) : W {
+    map<V,W extends CircularList<V>>(fn : LocalFunction<T,V>) : W {
         return new (this.constructor as any)(
             this._data.map((x,i) => fn(x,i,this.neighbourhood(i)))
         )
+    }
+
+    forEach(fn : LocalFunction<T,void>) : void {
+        this._data.forEach((x,i) => fn(x,i,this.neighbourhood(i)))
     }
 }
 

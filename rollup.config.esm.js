@@ -6,19 +6,24 @@ import typescript from 'rollup-plugin-typescript';
 export default {
     input: 'src/csf.ts',
 	output: {
-        file: 'build/bundle.mjs',
+        file: 'build/bundle.min.mjs',
 		format: 'esm',
-        sourcemap: 'inline',
 	},
 	onwarn(warning) {
 		console.error(`(!) ${warning.message}`);
 	},
 	plugins: [
-        typescript(),
 		resolve({
 		  jsnext: true,
 		  main: true,
 		}),
         commonjs(),
+        typescript(),
+		terser({
+			warnings: true,
+			mangle: {
+				module: true,
+			},
+		}),
 	]
 }

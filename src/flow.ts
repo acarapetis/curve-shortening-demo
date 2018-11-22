@@ -2,11 +2,12 @@
 // This software is licensed under the MIT license.
 // See COPYING for more details.
 
-import { localFunction } from './CircularList';
-import { point, add, subtract, scale, squaredLength, equals, Curve, ScalarFunction } from './geometry';
+import { LocalFunction } from './CircularList';
+import { Point, add, subtract, scale, squaredLength, equals, 
+    Curve, ScalarFunction } from './geometry';
 
 // Forward Euler approximation to CSF with tangential reparametrization
-export function reparametrizedCSF(dt : number) : localFunction<point, point>{
+export function reparametrizedCSF(dt : number) : LocalFunction<Point, Point>{
     return (point, index, x) => {
         let laplacian = add(x(1), x(-1), scale(x(0),-2));
         let dr2 = squaredLength(subtract(x(1),x(-1))) * 0.25;
