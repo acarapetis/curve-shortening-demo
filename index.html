@@ -3,8 +3,15 @@
   <head>
     <title>Curve Shortening Flow - Interactive Demonstration</title>
     <meta name=viewport content="width=device-width, initial-scale=1">
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script>
     <link rel="stylesheet" type="text/css" href="style.css">
+
+    <script type="text/javascript" src="https://unpkg.com/@webcomponents/webcomponentsjs@2.2.0/webcomponents-loader.js"></script>
+
+    <script type="module" src="build/bundle.min.mjs"></script>
+    <script nomodule src="build/bundle.min.js"></script>
+    <!--<script type="module" src="build/bundle.mjs"></script>-->
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script>
   </head>
   <body>
     <csf-app></csf-app>
@@ -17,9 +24,5 @@
       <p>The demonstration on this page scales time by a factor of \(1/\max |k|\) for each curve to avoid numerical errors. </p><p>Self-intersecting curves also jump over some cusps that are singularities of the smooth flow - this behaviour is qualitatively (and perhaps quantitatively) the same as that of the weak formulation of the flow. Red markers appear where the curvature is very large.</p>
       <p>&laquo; <a href="/">Home</a></p>
     </div>
-    <script type="text/javascript" src="https://unpkg.com/@webcomponents/webcomponentsjs@2.2.0/webcomponents-loader.js"></script>
-    <script type="module" src="build/bundle.min.mjs"></script>
-    <script nomodule src="build/bundle.min.js"></script>
-    <!--<script type="module" src="build/bundle.mjs"></script>-->
   </body>
 </html>
