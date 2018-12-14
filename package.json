@@ -5,9 +5,11 @@
   "main": "csf.js",
   "dependencies": {
     "@polymer/lit-element": "^0.6.3",
+    "bind-decorator": "^1.0.11",
     "color-interpolate": "^1.0.4"
   },
   "devDependencies": {
+    "@babel/core": "^7.1.6",
     "@babel/preset-env": "^7.1.6",
     "browser-sync": "^2.26.3",
     "core-js": "^2.5.7",

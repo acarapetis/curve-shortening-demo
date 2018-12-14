@@ -107,7 +107,7 @@ class CSFApp extends LitElement {
 
     @bind
     startFlow() {
-        this.canvas && this.curves.push(demoCurve(this.canvas));
+        if (this.canvas) this.curves.push(demoCurve(this.canvas));
         this.tick();
     }
 
@@ -183,37 +183,42 @@ class CSFApp extends LitElement {
         this.touchPaths.delete(e.identifier);
     }
 
+    drawHelpText() {
+        if (!this.ctx || !this.canvas) return;
+        this.ctx.fillStyle = 'black';
+        this.ctx.textAlign  = 'center';
+        this.ctx.textBaseline = 'top';
+        this.ctx.font = '40px MathJax_Main';
+        this.ctx.fillText('Draw a closed curve',this.canvas.width/2, 10);
+    }
+
     @bind
     tick() {
         requestAnimationFrame(this.tick);
-        const canvas = this.canvas;
-        const ctx = this.ctx;
-        if (!ctx || !canvas) return;
+        if (!this.ctx || !this.canvas) return;
+        const {width, height} = this.canvas;
 
-        ctx.clearRect(0,0,canvas.width,canvas.height);
+        this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
 
-        ctx.fillStyle = 'black';
-        ctx.textAlign  = 'center';
-        ctx.textBaseline = 'top';
-        if (this.curves.length == 0 && this.touchPaths.size == 0) {
-            ctx.font = '40px MathJax_Main';
-            ctx.fillText('Draw a closed curve',canvas.width/2, 10);
-        }
+        if (this.curves.length == 0 && this.touchPaths.size == 0)
+            this.drawHelpText();
 
         // If user is currently drawing any curves, show them in grey.
-        ctx.fillStyle = 'darkgrey';
+        this.ctx.fillStyle = 'darkgrey';
         for (let [id,c] of this.touchPaths.entries()) {
-            renderPath(c, ctx, 0.25);
+            renderPath(c, this.ctx, 0.25);
         }
 
-        ctx.fillStyle = 'black';
+        this.ctx.fillStyle = 'black';
 
         // Destroy curve if it is too small or curvature is too extreme
         this.curves = this.curves.filter(cu => 
             cu.length >= 5 && cu.curvature().max() < 5000
         );
 
-        const inBounds = ([x,y] : Point) => x > 0 && x < canvas.width && y > 0 && y < canvas.height;
+        const inBounds = ([x,y] : Point) => 
+            x > 0 && x < width && y > 0 && y < height;
+
         for (let [j,cu] of this.curves.entries()) {
             cu = cu.filter(inBounds);
 
@@ -227,7 +232,7 @@ class CSFApp extends LitElement {
             const cf: LocalFunction<Point,string> = (p,i,x) => curvatureColor(curvature(x));
 
             // Render
-            renderClosedCurve(cu, ctx, {
+            renderClosedCurve(cu, this.ctx, {
                 colorFunction: (p,i,x) => curvatureColor(curvature(x))
             });
         }
@@ -242,7 +247,10 @@ function demoCurve(canvas : HTMLCanvasElement) {
         var x = canvas.width/2 + canvas.width*(0.05 * Math.cos(2*Math.PI*i/N));
         curve.push([
             x + 0.2*canvas.width*Math.pow(Math.cos(2*Math.PI*i/N),101),
-            canvas.height * (0.15 + 0.05 * Math.sin(2*Math.PI*i/N) + 0.05*Math.sin(x/5) + 0.7 * Math.pow(Math.sin(2*Math.PI*i/N), 150))
+            canvas.height * (
+                0.15 + 0.05 * Math.sin(2*Math.PI*i/N) 
+                + 0.05*Math.sin(x/5) 
+                + 0.7 * Math.pow(Math.sin(2*Math.PI*i/N), 150))
         ]);
     }
     return new Curve(curve);
