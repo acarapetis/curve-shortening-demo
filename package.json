@@ -4,11 +4,9 @@
   "description": "An interactive demonstration of curve-shortening flow",
   "main": "csf.js",
   "dependencies": {
-    "@polymer/lit-element": "^0.6.3",
-    "color-interpolate": "^1.0.4"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.4.7",
+    "lit-element": "^2.1.0",
+    "color-interpolate": "^1.0.4",
+    "@babel/core": "^7.4.5",
     "@babel/preset-env": "^7.1.6",
     "bind-decorator": "^1.0.11",
     "browser-sync": "^2.26.3",
