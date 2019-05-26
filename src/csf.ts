@@ -6,7 +6,7 @@ import {reparametrizedCSF, remesh, clean} from './flow';
 import {renderClosedCurve, renderPath} from './graphics';
 import {Point,Curve,scale,add,subtract,squaredLength,curvature} from './geometry';
 import {CircularList, LocalFunction} from './CircularList';
-import {LitElement, html, property, query, queryAll, customElement} from '@polymer/lit-element';
+import {LitElement, html, property, query, queryAll, customElement} from 'lit-element';
 import interpolate from 'color-interpolate';
 import bind from 'bind-decorator';
 
