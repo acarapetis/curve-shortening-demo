@@ -215,10 +215,17 @@ class CSFApp extends LitElement {
 
         const inBounds = ([x,y] : Point) => x > 0 && x < canvas.width && y > 0 && y < canvas.height;
         for (let [j,cu] of this.curves.entries()) {
+            const area = cu.area();
+
             cu = cu.filter(inBounds);
 
             // Flow
-            cu = this.curves[j] = cu.map(reparametrizedCSF(dt/cu.curvature().max()));
+            cu = cu.map(reparametrizedCSF(dt/cu.curvature().max()));
+
+            // Rescale
+            cu = cu.scale(Math.sqrt(area / cu.area()));
+
+            this.curves[j] = cu;
 
             // Clean
             remesh(cu, this.seglength);
