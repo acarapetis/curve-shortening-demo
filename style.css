@@ -54,3 +54,24 @@ a:hover {
         flex: 0 0 200px;
     }
 }
+
+#controls {
+    border-bottom: 1px solid black;
+    margin: -0.5em -0.5em 0.5em -0.5em;
+    padding: 0.5em 0.5em 0 0.5em;
+}
+#controls h2 {
+    margin: 0;
+    font-weight: normal;
+    font-size: 120%;
+}
+#controls label {
+    margin: 10px;
+    display: block;
+}
+#controls .hint {
+    border-bottom: 1px dotted black;
+}
+input[type=range], input[type=checkbox] {
+    margin-right: 10px;
+}

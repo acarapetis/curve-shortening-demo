@@ -25,6 +25,10 @@ export function scale([x,y] : Point, c : number) : Point {
     return [x*c,y*c];
 }
 
+export function scaleFrom(point : Point, center : Point, factor : number) : Point {
+    return add(scale(subtract(point, center), factor), center);
+}
+
 export function squaredLength([x,y] : Point) : number {
     return x*x + y*y;
 }
@@ -58,6 +62,32 @@ export class Curve extends CircularList<Point> {
         return new ScalarFunction(
             this.map((p,i,nbhd) => curvature(nbhd)) as CircularList<number>
         );
+    }
+
+    // Computes (abs value of signed) area via the shoelace formula
+    area() : number {
+        const n = this.length;
+        
+        let sum0 = 0;
+        for(let i = 0; i < n; ++i) {
+            sum0 += this.get(i)[0] * this.get(i+1)[1];
+        }
+        
+        let sum1 = 0;
+        for(let i = 0; i < n; ++i) {
+            sum1 += this.get(i+1)[0] * this.get(i)[1];
+        }
+
+        return Math.abs(sum0 - sum1) / 2;
+    }
+
+    center() : Point {
+        return scale(add(...this), 1/this.length);
+    }
+
+    scale(c : number) : Curve {
+        const center = this.center();
+        return this.map(p => scaleFrom(p, center, c));
     }
 }
 
