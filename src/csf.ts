@@ -46,7 +46,7 @@ function eachTouch(handler : (touch : PointerInput) => void) : (e: MouseEvent|To
 
 const curvatureColor = (k:number) => interpolate(['black','red'])(k*100);
 
-@customElement('csf-app' as any)
+@customElement('csf-app')
 class CSFApp extends LitElement {
     touchPaths : Map<number|string,Point[]> = new Map();
     curves : Curve[] = [];
