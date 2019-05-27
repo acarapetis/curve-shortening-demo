@@ -19,6 +19,6 @@ cause an automatic reload of the page.
 
 ## Building
 
-Run `npm build` to compile the production javascript bundles, which are
+Run `npm run build` to compile the production javascript bundles, which are
 compatible with older browsers. You can then install index.html and style.css
 along with the resulting build/ directory on any web server.
