@@ -25,9 +25,11 @@
     "browser-sync": "^2.26.3"
   },
   "scripts": {
-    "browse": "browser-sync start --s --ss build --index index.html --files *.html,build/*.js,build/*.mjs,*.css --no-notify",
+    "browse": "node browse.js",
     "build:dev": "rollup -c rollup.config.dev.js -w -m",
-    "build": "rollup -c rollup.config.js && rollup -c rollup.config.esm.js",
+    "build:prod": "rollup -c rollup.config.js",
+    "build:esm": "rollup -c rollup.config.esm.js",
+    "build": "npm-run-all --parallel build:prod build:esm",
     "start": "npm-run-all --parallel build:dev browse"
   },
   "repository": {
