@@ -66,6 +66,9 @@ class CSFApp extends LitElement {
     @property({type: Boolean})
     preserveArea = false;
 
+    @property({type: Boolean})
+    colorCode = true;
+
     render() {
         return html`
             <style>
@@ -226,8 +229,8 @@ class CSFApp extends LitElement {
             cu = cu.map(reparametrizedCSF(dt/cu.curvature().max()));
 
             if (this.preserveArea) {
-            // Rescale
-            cu = cu.scale(Math.sqrt(area / cu.area()));
+                // Rescale
+                cu = cu.scale(Math.sqrt(area / cu.area()));
             }
 
             this.curves[j] = cu;
@@ -236,12 +239,13 @@ class CSFApp extends LitElement {
             remesh(cu, this.seglength);
             clean(cu);
 
-            const cf: LocalFunction<Point,string> = (p,i,x) => curvatureColor(curvature(x));
+            const colorFunction: LocalFunction<Point,string> = 
+                this.colorCode 
+                    ? (p, i, x) => curvatureColor(curvature(x))
+                    : () => 'black';
 
             // Render
-            renderClosedCurve(cu, ctx, {
-                colorFunction: (p,i,x) => curvatureColor(curvature(x))
-            });
+            renderClosedCurve(cu, ctx, { colorFunction });
         }
     };
 }

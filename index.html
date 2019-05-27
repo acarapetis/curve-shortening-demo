@@ -22,6 +22,10 @@
           <input type="checkbox" name="preserveArea">
           <span class="hint" title="Modifies the flow to preserve the signed area of the curve. Does not play nicely with self-intersections">Preserve Area</span>
         </label>
+        <label>
+          <input type="checkbox" name="colorCode" checked>
+          <span>Color curves by curvature</span>
+        </label>
       </div>
       <p><a class="title" href="http://en.wikipedia.org/wiki/Curve-shortening_flow">Curve-shortening flow</a> is the simplest example of a curvature flow. It moves each point on a plane curve \(\gamma\) in the inwards normal direction \(-\nu\) with speed proportional to the signed curvature \(k\) at that point, as described by the equation</p>
       <p>$$ \frac{\partial \gamma}{\partial t} = - k \nu.$$</p>
