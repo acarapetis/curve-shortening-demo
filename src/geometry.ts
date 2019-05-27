@@ -64,6 +64,7 @@ export class Curve extends CircularList<Point> {
         );
     }
 
+    // Computes (abs value of signed) area via the shoelace formula
     area() : number {
         const n = this.length;
         

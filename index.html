@@ -14,8 +14,15 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script>
   </head>
   <body>
-    <csf-app></csf-app>
+    <csf-app id="app"></csf-app>
     <div id="info">
+      <div id="controls" onchange="readControl(event.target)">
+        <h2>Options</h2>
+        <label>
+          <input type="checkbox" name="preserveArea">
+          <span class="hint" title="Modifies the flow to preserve the signed area of the curve. Does not play nicely with self-intersections">Preserve Area</span>
+        </label>
+      </div>
       <p><a class="title" href="http://en.wikipedia.org/wiki/Curve-shortening_flow">Curve-shortening flow</a> is the simplest example of a curvature flow. It moves each point on a plane curve \(\gamma\) in the inwards normal direction \(-\nu\) with speed proportional to the signed curvature \(k\) at that point, as described by the equation</p>
       <p>$$ \frac{\partial \gamma}{\partial t} = - k \nu.$$</p>
       <p>The name "curve-shortening" comes from the fact that the curve is always moving so as to decrease its length as efficiently as possible. The flow is the lowest-dimensional case of the <em>mean curvature flow</em>: for example, the next case deforms surfaces so as to decrease their area efficiently.</p>
@@ -25,4 +32,10 @@
       <p>&laquo; <a href="/">Home</a></p>
     </div>
   </body>
+  <script>
+    function readControl(el) {
+      var app = document.getElementById('app');
+      app[el.name] = (el.type == 'checkbox') ? !!el.checked : el.value;
+    }
+  </script>
 </html>

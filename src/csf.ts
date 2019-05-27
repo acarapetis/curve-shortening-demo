@@ -63,6 +63,9 @@ class CSFApp extends LitElement {
     @property({type: Number})
     bufferHeight = 200;
 
+    @property({type: Boolean})
+    preserveArea = false;
+
     render() {
         return html`
             <style>
@@ -222,8 +225,10 @@ class CSFApp extends LitElement {
             // Flow
             cu = cu.map(reparametrizedCSF(dt/cu.curvature().max()));
 
+            if (this.preserveArea) {
             // Rescale
             cu = cu.scale(Math.sqrt(area / cu.area()));
+            }
 
             this.curves[j] = cu;
 
