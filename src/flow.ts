@@ -7,7 +7,7 @@ import { Point, add, subtract, scale, squaredLength, equals,
     Curve, ScalarFunction } from './geometry';
 
 // Forward Euler approximation to CSF with tangential reparametrization
-export function reparametrizedCSF(dt : number) : LocalFunction<Point, Point>{
+export function flowStep(dt : number) : LocalFunction<Point, Point>{
     return (point, index, x) => {
         let laplacian = add(x(1), x(-1), scale(x(0),-2));
         let dr2 = squaredLength(subtract(x(1),x(-1))) * 0.25;
@@ -41,4 +41,24 @@ export function clean(cu : Curve) {
     for (let i = 0; i < cu.length; i++) {
         if (equals(cu.get(i), cu.get(i+2))) cu.splice(i--,2);
     }
+}
+
+interface FullStepOpts {
+    bounds?: [Point, Point];
+    seglength?: number;
+}
+
+export function fullStep(cu: Curve, dt: number, 
+    {bounds, seglength = 5}: FullStepOpts = {}): Curve|null 
+{
+    if (bounds) cu = cu.filter(([x,y]) => 
+        x >= bounds[0][0] && x <= bounds[1][0] && y >= bounds[0][1] && y <= bounds[1][1]
+    );
+    const curvature = cu.curvature();
+    if (cu.length < 5 || curvature.max() > 5000) return null;
+
+    cu = cu.map(flowStep(dt/curvature.max()));
+    remesh(cu, seglength);
+    clean(cu);
+    return cu;
 }

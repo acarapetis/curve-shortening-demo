@@ -2,7 +2,7 @@
 // This software is licensed under the MIT license.
 // See COPYING for more details.
 
-import {reparametrizedCSF, remesh, clean} from './flow';
+import {fullStep} from './flow';
 import {renderClosedCurve, renderPath} from './graphics';
 import {Point,Curve,scale,add,subtract,squaredLength,curvature} from './geometry';
 import {CircularList, LocalFunction} from './CircularList';
@@ -198,7 +198,7 @@ class CSFApp extends LitElement {
         if (!this.ctx || !this.canvas) return;
         const {width, height} = this.canvas;
 
-        this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
+        this.ctx.clearRect(0,0,width,height);
 
         if (this.curves.length == 0 && this.touchPaths.size == 0)
             this.drawHelpText();
@@ -211,19 +211,15 @@ class CSFApp extends LitElement {
 
         this.ctx.fillStyle = 'black';
 
-        // Destroy curve if it is too small or curvature is too extreme
-        this.curves = this.curves.filter(cu => 
-            cu.length >= 5 && cu.curvature().max() < 5000
-        );
-
-        const inBounds = ([x,y] : Point) => 
-            x > 0 && x < width && y > 0 && y < height;
+        this.curves = this.curves.map(cu => fullStep(cu, dt, {
+                seglength: this.seglength,
+                bounds: [[0,0], [width,height]],
+            }))
+            .filter(cu => cu instanceof Curve);
 
         for (let [j,cu] of this.curves.entries()) {
-            cu = cu.filter(inBounds);
-
             // Flow
-            cu = this.curves[j] = cu.map(reparametrizedCSF(dt/cu.curvature().max()));
+                cu = this.curves[j] = );
 
             // Clean
             remesh(cu, this.seglength);
