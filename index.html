@@ -36,11 +36,11 @@
       <p>This applet is open-source - it was developed by me and other contributors, and can be freely modified and redistributed by anyone. Check out the <a href="https://github.com/acarapetis/curve-shortening-demo">source code at GitHub</a>.</p>
       <p>&laquo; <a href="/">Home</a></p>
     </div>
+    <script>
+      function readControl(el) {
+        var app = document.getElementById('app');
+        app[el.name] = (el.type == 'checkbox') ? !!el.checked : el.value;
+      }
+    </script>
   </body>
-  <script>
-    function readControl(el) {
-      var app = document.getElementById('app');
-      app[el.name] = (el.type == 'checkbox') ? !!el.checked : el.value;
-    }
-  </script>
 </html>
