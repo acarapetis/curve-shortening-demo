@@ -2,8 +2,6 @@
 // This software is licensed under the MIT license.
 // See COPYING for more details.
 
-import { Point } from './geometry';
-
 export type Neighbourhood<T> = (offset : number) => T;
 
 export type LocalFunction<T,V> =
@@ -58,7 +56,7 @@ export class CircularList<T> {
     }
 
     *neighbourhoods() {
-        for (let [index,value] of this._data.entries()) {
+        for (let index of this._data.keys()) {
             yield this.neighbourhood(index);
         }
     }
