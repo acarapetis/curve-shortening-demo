@@ -7,7 +7,7 @@ import typescript from 'rollup-plugin-typescript';
 // Rollup config for minified production builds
 
 const config = (output, babelConf) => ({
-    input: 'build/csf.js',
+    input: 'src/csf.ts',
     output,
     onwarn(warning) {
         console.error(`(!) ${warning.message}`);
