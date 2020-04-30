@@ -69,6 +69,9 @@ class CSFApp extends LitElement {
     @property({type: Boolean})
     colorCode = true;
 
+    @property({type: Boolean})
+    paused = false;
+
     render() {
         return html`
             <style>
@@ -192,6 +195,7 @@ class CSFApp extends LitElement {
     @bind
     tick() {
         requestAnimationFrame(this.tick);
+        if (this.paused) return;
         const canvas = this.canvas;
         const ctx = this.ctx;
         if (!ctx || !canvas) return;

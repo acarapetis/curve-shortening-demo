@@ -19,8 +19,12 @@
       <div id="controls" onchange="readControl(event.target)">
         <h2>Options</h2>
         <label>
+          <input type="checkbox" name="paused">
+          <span>Pause Flow</span>
+        </label>
+        <label>
           <input type="checkbox" name="preserveArea">
-          <span class="hint" title="Modifies the flow to preserve the signed area of the curve. Does not play nicely with self-intersections">Preserve Area</span>
+          <span class="hint" title="Rescales the flow to preserve the signed area of the curve. Does not play nicely with self-intersections">Preserve Area</span>
         </label>
         <label>
           <input type="checkbox" name="colorCode" checked>
