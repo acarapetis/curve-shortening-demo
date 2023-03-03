@@ -10,7 +10,7 @@ import { Point, add, subtract, scale, squaredLength, equals,
 export function reparametrizedCSF(dt : number) : LocalFunction<Point, Point>{
     return (point, index, x) => {
         let laplacian = add(x(1), x(-1), scale(x(0),-2));
-        let dr2 = squaredLength(subtract(x(1),x(-1))) * 1;
+        let dr2 = squaredLength(subtract(x(1),x(-1))) * .25;
         return add(x(0), scale(laplacian, dt / dr2));
     }
 }

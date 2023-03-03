@@ -19,7 +19,7 @@ interface renderClosedCurveOpts {
 export function renderClosedCurve(
     curve : Curve, 
     ctx : CanvasRenderingContext2D, 
-    { colorFunction = constant('black') } : renderClosedCurveOpts = {}
+    { colorFunction = constant('blue') } : renderClosedCurveOpts = {}
 ) {
     ctx.save();
 
