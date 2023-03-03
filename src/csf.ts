@@ -234,7 +234,7 @@ class CSFApp extends LitElement {
 
             if (this.preserveArea) {
                 // Rescale
-                cu = cu.scale(Math.sqrt(area / cu.area()));
+                cu = cu.scale(Math.sqrt(.5 * area / cu.area()));
             }
 
             this.curves[j] = cu;
@@ -266,5 +266,15 @@ function demoCurve(canvas : HTMLCanvasElement) {
         ]);
     }
     return new Curve(curve);
+}
+
+function otherDemoCurve(canvas : HTMLCanvasELement) {
+    // Generate another curve
+    var N = 200;
+    var curve : Point[] = [];
+    for (var i = 0; i < N; i++) {
+        var x = 1;
+    }
+    return 0
 }
 

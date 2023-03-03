@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Curve Shortening Flow - Ripoff of an Interactive Demonstration</title>
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+    <script type="text/javascript" src="https://unpkg.com/@webcomponents/webcomponentsjs@2.2.0/webcomponents-loader.js"></script>
+
+    <script type="module" src="build/bundle.min.mjs"></script>
+    <script nomodule src="build/bundle.min.js"></script>
+    <!--<script type="module" src="build/bundle.mjs"></script>-->
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script>
+  </head>
+  <body>
+    <csf-app id="app"></csf-app>
+    <div id="info">
+      <div id="controls" onchange="readControl(event.target)">
+        <h2>Options</h2>
+        <label>
+          <input type="checkbox" name="paused">
+          <span>Pause Flow</span>
+        </label>
+        <label>
+          <input type="checkbox" name="preserveArea">
+          <span class="hint" title="Rescales the flow to preserve the signed area of the curve. Does not play nicely with self-intersections">Preserve Area</span>
+        </label>
+        <label>
+          <input type="checkbox" name="colorCode" checked>
+          <span>Color curves by curvature</span>
+        </label>
+      </div>
+      <p><a class="title" href="http://en.wikipedia.org/wiki/Curve-shortening_flow">Curve-shortening flow</a> is the simplest example of a curvature flow. It moves each point on a plane curve \(\gamma\) in the inwards normal direction \(-\nu\) with speed proportional to the signed curvature \(k\) at that point, as described by the equation:</p>
+      <p>$$ \frac{\partial \gamma}{\partial t} = - k \nu.$$</p>
+      <p>The name "curve-shortening" comes from the fact that the curve is always moving so as to decrease its length as efficiently as possible. The flow is the lowest-dimensional case of the <em>mean curvature flow</em>: for example, the next case deforms surfaces so as to decrease their area efficiently.</p>
+      <p>For any initial curve that does not intersect itself, the flow will converge to a "round point" in finite time - this is the Gage-Hamilton-Grayson theorem.</p>
+      <p><b>New:</b> You can make video recordings of this demonstration by following <a href="https://a.carapetis.com/csf_record/">this link</a>. Only works in Google Chrome (not mobile friendly).</p>
+      <p>The demonstration on this page scales time by a factor of \(1/\max |k|\) for each curve to avoid numerical errors. </p><p>Self-intersecting curves also jump over some cusps that are singularities of the smooth flow - this behaviour is qualitatively (and perhaps quantitatively) the same as that of the weak formulation of the flow.</p>
+      <p>This applet is open-source - it was developed by me and other contributors, and can be freely modified and redistributed by anyone. Check out the <a href="https://github.com/acarapetis/curve-shortening-demo">source code at GitHub</a>.</p>
+      <p>&laquo; <a href="/">Home</a></p>
+    </div>
+    <script>
+      function readControl(el) {
+        var app = document.getElementById('app');
+        app[el.name] = (el.type == 'checkbox') ? !!el.checked : el.value;
+      }
+    </script>
+  </body>
+</html>
