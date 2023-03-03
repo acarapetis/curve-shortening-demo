@@ -234,7 +234,7 @@ class CSFApp extends LitElement {
 
             if (this.preserveArea) {
                 // Rescale
-                cu = cu.scale(Math.sqrt(.5 * area / cu.area()));
+                cu = cu.scale(Math.sqrt(2* area / cu.area()));
             }
 
             this.curves[j] = cu;
