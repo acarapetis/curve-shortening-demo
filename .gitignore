@@ -1,3 +1,6 @@
 node_modules
 build
 index.dev.html
+
+# Local Netlify folder
+.netlify
