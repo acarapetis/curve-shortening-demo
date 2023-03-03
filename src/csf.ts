@@ -207,7 +207,7 @@ class CSFApp extends LitElement {
         ctx.textBaseline = 'top';
         if (this.curves.length == 0 && this.touchPaths.size == 0) {
             ctx.font = '40px MathJax_Main';
-            ctx.fillText('Draw a closed curve',canvas.width/2, 10);
+            ctx.fillText('I have stolen this website',canvas.width/2, 10);
         }
 
         // If user is currently drawing any curves, show them in grey.
